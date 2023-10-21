@@ -32,7 +32,8 @@ export const register = asyncHandler(async (req, res, next) => {
      const user = await User.create({...req.body, password: hash_pass})
      res.status(200).json({
       message: "User Created Successfull!",
-      user: user
+      user: user,
+      path: '/'
      })
     } catch (error) {
       next(error)
@@ -85,7 +86,12 @@ export const login = asyncHandler(async (req, res, next) => {
             expiresIn: process.env.REFRESH_TOKEN_EXPIRE_IN 
             });
            
-           res.cookie('access_token', token)
+           res.cookie('access_token', token,{
+            httpOnly: true,
+            secure: process.env.APP_ENV == "Development"? false : true,
+            sameSite: "strict",
+            maxAge: 7* 24* 60* 1000
+           })
            res.status(200).json({
             message: 'Login successfull!',
             user: findUser,
@@ -104,10 +110,21 @@ export const login = asyncHandler(async (req, res, next) => {
  * @route api/auth/logout
  */
 
-  
   export const logout = asyncHandler(async(req, res, next) => {
     res.clearCookie("access_token");
     res.status(200).json({
         message: "Logout Successful"
     })
   })
+
+
+
+/**
+ * @access public
+ * @method post
+ * @route api/auth/loggedInUser
+ */
+
+export const loggedInUser = asyncHandler(async(req, res) => {
+  res.status(200).json(req.me)
+})
