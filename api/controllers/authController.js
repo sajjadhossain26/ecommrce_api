@@ -33,7 +33,6 @@ export const register = asyncHandler(async (req, res, next) => {
      res.status(200).json({
       message: "User Created Successfull!",
       user: user,
-      path: '/'
      })
     } catch (error) {
       next(error)
@@ -89,8 +88,9 @@ export const login = asyncHandler(async (req, res, next) => {
            res.cookie('access_token', token,{
             httpOnly: true,
             secure: process.env.APP_ENV == "Development"? false : true,
-            sameSite: "strict",
-            maxAge: 7* 24* 60* 1000
+             sameSite: "strict",
+             path: '/',
+             maxAge: 7* 24* 60* 1000
            })
            res.status(200).json({
             message: 'Login successfull!',
